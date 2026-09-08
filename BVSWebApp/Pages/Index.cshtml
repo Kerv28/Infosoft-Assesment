@@ -1,0 +1,412 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Bogsy Video Store (BVS)";
+}
+
+@{
+    var totalOut = Model.CustomerReport.Count;
+    var overdueCount = 0;
+    foreach (var r in Model.CustomerReport)
+    {
+        if (DateTime.TryParse(r.DueDate, out var due) && DateTime.Now.Date > due.Date)
+        {
+            overdueCount++;
+        }
+    }
+}
+
+<div class="bvs">
+
+    <div class="bvs-hero">
+        <div>
+            <span class="bvs-hero-eyebrow">Buhangin, Davao City</span>
+            <h1 class="bvs-hero-title">Bogsy Video Store</h1>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-info alert-dismissible fade show bvs-alert" role="alert">
+            @Model.Message
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="bvs-stats">
+        <div class="bvs-stat">
+            <span class="bvs-stat-value">@Model.Videos.Count</span>
+            <span class="bvs-stat-label">Titles in catalog</span>
+        </div>
+        <div class="bvs-stat">
+            <span class="bvs-stat-value">@Model.Customers.Count</span>
+            <span class="bvs-stat-label">Customers</span>
+        </div>
+        <div class="bvs-stat">
+            <span class="bvs-stat-value">@totalOut</span>
+            <span class="bvs-stat-label">Videos out right now</span>
+        </div>
+        <div class="bvs-stat @(overdueCount > 0 ? "bvs-stat-warn" : "")">
+            <span class="bvs-stat-value">@overdueCount</span>
+            <span class="bvs-stat-label">Overdue</span>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Customer Library -->
+        <div class="col-md-6">
+            <div class="card bvs-card shadow-sm">
+                <div class="card-header bvs-card-header">
+                    <h5 class="mb-0">Customer Library</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="AddCustomer" class="bvs-form">
+                        <div class="mb-3">
+                            <label class="form-label bvs-label">Customer name</label>
+                            <input type="text" name="name" class="form-control" placeholder="Juan Dela Cruz" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label bvs-label">Contact number</label>
+                            <input type="text" name="contact" class="form-control" placeholder="0917-123-4567" />
+                        </div>
+                        <button type="submit" class="btn bvs-btn-primary">Add customer</button>
+                    </form>
+
+                    @if (Model.Customers.Any())
+                    {
+                        <hr class="my-4" />
+                        <div class="bvs-scroll">
+                            <table class="table table-sm bvs-mini-table">
+                                <thead><tr><th>Name</th><th>Contact</th></tr></thead>
+                                <tbody>
+                                @foreach (var c in Model.Customers)
+                                {
+                                    <tr><td>@c.Name</td><td>@c.ContactNumber</td></tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Library -->
+        <div class="col-md-6">
+            <div class="card bvs-card shadow-sm">
+                <div class="card-header bvs-card-header">
+                    <h5 class="mb-0">Video Library</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="AddVideo" class="bvs-form">
+                        <div class="mb-2">
+                            <label class="form-label bvs-label">Title</label>
+                            <input type="text" name="title" class="form-control" placeholder="Madagascar" required />
+                        </div>
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <label class="form-label bvs-label">Category</label>
+                                <select name="category" class="form-select">
+                                    <option value="VCD">VCD &middot; \u20b125</option>
+                                    <option value="DVD">DVD &middot; \u20b150</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label bvs-label">Rental limit</label>
+                                <select name="days" class="form-select">
+                                    <option value="1">1 day</option>
+                                    <option value="2">2 days</option>
+                                    <option value="3">3 days</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label bvs-label">Total stock</label>
+                            <input type="number" name="quantity" class="form-control" placeholder="e.g. 3" min="1" required />
+                        </div>
+                        <button type="submit" class="btn bvs-btn-primary">Add video</button>
+                    </form>
+
+                    @if (Model.Videos.Any())
+                    {
+                        <hr class="my-4" />
+                        <div class="bvs-scroll">
+                            <table class="table table-sm bvs-mini-table">
+                                <thead><tr><th>Title</th><th>Cat.</th><th></th></tr></thead>
+                                <tbody>
+                                @foreach (var v in Model.Videos)
+                                {
+                                    <tr>
+                                        <td>@v.Title</td>
+                                        <td><span class="bvs-badge bvs-badge-@(v.Category == "DVD" ? "dvd" : "vcd")">@v.Category</span></td>
+                                        <td class="text-end">
+                                            <form method="post" asp-page-handler="DeleteVideo" class="d-inline"
+                                                  onsubmit="return confirm('Delete &quot;@v.Title&quot;?');">
+                                                <input type="hidden" name="videoId" value="@v.VideoID" />
+                                                <button type="submit" class="btn btn-sm bvs-btn-ghost-danger">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rental & Return Module -->
+    <div class="card bvs-card shadow-sm my-4">
+        <div class="card-header bvs-card-header bvs-card-header-dark">
+            <h5 class="mb-0">Rental Module</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 bvs-rental-split">
+                    <h6 class="bvs-subhead">Rent a video</h6>
+                    <form method="post" asp-page-handler="Rent" class="bvs-form">
+                        <div class="mb-2">
+                            <select name="customerId" class="form-select" required>
+                                <option value="">Choose a customer</option>
+                                @foreach (var c in Model.Customers)
+                                {
+                                    <option value="@c.CustomerID">@c.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <select name="videoId" class="form-select" required>
+                                <option value="">Choose a video</option>
+                                @foreach (var v in Model.Videos)
+                                {
+                                    <option value="@v.VideoID">@v.Title (@v.Category)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <select name="days" class="form-select">
+                                <option value="1">1 day</option>
+                                <option value="2">2 days</option>
+                                <option value="3">3 days</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn bvs-btn-primary">Process rental</button>
+                    </form>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="bvs-subhead">Return a video</h6>
+                    @if (Model.CustomerReport.Any())
+                    {
+                        <form method="post" asp-page-handler="Return" class="bvs-form">
+                            <div class="mb-3">
+                                <label class="form-label bvs-label">Active rental</label>
+                                <select name="rentalId" class="form-select" required>
+                                    <option value="">Choose what's being returned</option>
+                                    @foreach (var r in Model.CustomerReport)
+                                    {
+                                        <option value="@r.RentDate">@r.CustomerName &middot; @r.VideoTitle (due @r.DueDate)</option>
+                                    }
+                                </select>
+                            </div>
+                            <button type="submit" class="btn bvs-btn-danger">Process return</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">Nothing is currently rented out.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report 1: Alphabetical Video Inventory -->
+    <div class="card bvs-card shadow-sm my-4">
+        <div class="card-header bvs-card-header bvs-card-header-muted">
+            <h5 class="mb-0">Report &middot; Video inventory (alphabetical)</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped align-middle bvs-report-table">
+                <thead>
+                    <tr><th>Title</th><th>Category</th><th class="text-end">In</th><th class="text-end">Out</th></tr>
+                </thead>
+                <tbody>
+                @foreach (var row in Model.InventoryReport)
+                {
+                    <tr>
+                        <td>@row.Title</td>
+                        <td><span class="bvs-badge bvs-badge-@(row.Category == "DVD" ? "dvd" : "vcd")">@row.Category</span></td>
+                        <td class="text-end bvs-num-in">@row.In</td>
+                        <td class="text-end @(row.Out > 0 ? "bvs-num-out" : "bvs-num-zero")">@row.Out</td>
+                    </tr>
+                }
+                @if (!Model.InventoryReport.Any())
+                {
+                    <tr><td colspan="4" class="text-center text-muted py-4">Nothing in the catalog yet.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Report 2: Currently Rented Videos -->
+    <div class="card bvs-card shadow-sm my-4">
+        <div class="card-header bvs-card-header bvs-card-header-muted">
+            <h5 class="mb-0">Report &middot; Currently rented videos</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered align-middle bvs-report-table">
+                <thead>
+                    <tr><th>Customer</th><th>Video</th><th>Category</th><th>Rented</th><th>Due</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody>
+                @foreach (var row in Model.CustomerReport)
+                {
+                    var isOverdue = DateTime.TryParse(row.DueDate, out var due) && DateTime.Now.Date > due.Date;
+                    <tr>
+                        <td>@row.CustomerName</td>
+                        <td>@row.VideoTitle</td>
+                        <td><span class="bvs-badge bvs-badge-@(row.Category == "DVD" ? "dvd" : "vcd")">@row.Category</span></td>
+                        <td>@row.RentDate</td>
+                        <td>@row.DueDate</td>
+                        <td>
+                            @if (isOverdue)
+                            {
+                                <span class="bvs-pill bvs-pill-late">Overdue</span>
+                            }
+                            else
+                            {
+                                <span class="bvs-pill bvs-pill-ok">On time</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <form method="post" asp-page-handler="Return" class="d-inline">
+                                <input type="hidden" name="rentalId" value="@row.RentDate" />
+                                <button type="submit" class="btn btn-sm bvs-btn-ghost-danger">Return</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.CustomerReport.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted py-4">Nothing is checked out right now.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .bvs {
+        --brand: #7b2d3d;
+        --brand-dark: #5a1f2b;
+        --gold: #d9a441;
+        --paper: #faf7f2;
+        --ink: #2b2118;
+        --ink-dim: #766a5a;
+        --teal: #2f6f63;
+        --teal-soft: #e2f0ec;
+        --red-soft: #fbe6e3;
+        --red: #b23a2f;
+        color: var(--ink);
+    }
+
+    .bvs-hero {
+        background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+        border-radius: 12px;
+        padding: 1.5rem 1.75rem;
+        margin-bottom: 1.25rem;
+        color: #fff;
+    }
+    .bvs-hero-eyebrow {
+        display: block;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 0.25rem;
+    }
+    .bvs-hero-title {
+        font-weight: 700;
+        font-size: 1.9rem;
+        margin: 0;
+    }
+
+    .bvs-alert { border: none; background: var(--teal-soft); color: #204a41; }
+
+    .bvs-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    .bvs-stat {
+        background: #fff;
+        border: 1px solid #eee0d2;
+        border-left: 4px solid var(--gold);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+    }
+    .bvs-stat-warn { border-left-color: var(--red); }
+    .bvs-stat-value { display: block; font-size: 1.5rem; font-weight: 700; }
+    .bvs-stat-label { display: block; font-size: 0.72rem; color: var(--ink-dim); }
+
+    .bvs-card { border: 1px solid #eee0d2; border-radius: 10px; overflow: hidden; }
+    .bvs-card-header {
+        background: var(--paper);
+        border-bottom: 1px solid #eee0d2;
+        color: var(--brand-dark);
+        font-weight: 600;
+    }
+    .bvs-card-header-dark { background: var(--brand); color: #fff; }
+    .bvs-card-header-muted { background: #f3ede2; color: var(--ink); }
+
+    .bvs-label { font-size: 0.8rem; color: var(--ink-dim); font-weight: 500; }
+
+    .bvs-btn-primary {
+        background: var(--gold);
+        border-color: var(--gold);
+        color: var(--brand-dark);
+        font-weight: 600;
+    }
+    .bvs-btn-primary:hover { background: #e6b559; color: var(--brand-dark); }
+    .bvs-btn-danger { background: var(--red); border-color: var(--red); color: #fff; font-weight: 600; }
+    .bvs-btn-danger:hover { background: #c94538; color: #fff; }
+    .bvs-btn-ghost-danger { background: transparent; border: 1px solid #d9b3ae; color: var(--red); }
+    .bvs-btn-ghost-danger:hover { background: var(--red-soft); }
+
+    .bvs-scroll { max-height: 180px; overflow-y: auto; }
+    .bvs-mini-table { font-size: 0.85rem; margin-bottom: 0; }
+
+    .bvs-report-table { font-size: 0.92rem; }
+
+    .bvs-badge {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 0.15rem 0.5rem;
+        border-radius: 5px;
+    }
+    .bvs-badge-vcd { background: #fbe9cc; color: #8a5a12; }
+    .bvs-badge-dvd { background: var(--teal-soft); color: var(--teal); }
+
+    .bvs-pill { font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px; }
+    .bvs-pill-ok { background: var(--teal-soft); color: var(--teal); }
+    .bvs-pill-late { background: var(--red-soft); color: var(--red); }
+
+    .bvs-num-in { color: var(--teal); font-weight: 700; }
+    .bvs-num-out { color: #a9781e; font-weight: 700; }
+    .bvs-num-zero { color: #b7ac97; font-weight: 700; }
+
+    .bvs-subhead { color: var(--ink-dim); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 0.75rem; }
+    .bvs-rental-split { border-right: 1px solid #eee0d2; }
+
+    @@media (max-width: 767px) {
+        .bvs-stats { grid-template-columns: repeat(2, 1fr); }
+        .bvs-rental-split { border-right: none; border-bottom: 1px solid #eee0d2; padding-bottom: 1.25rem; margin-bottom: 1.25rem; }
+    }
+</style>

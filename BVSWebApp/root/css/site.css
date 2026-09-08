@@ -1,0 +1,190 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+    --brand: #7b2d3d;
+    --brand-dark: #5a1f2b;
+    --brand-darker: #401621;
+    --gold: #d9a441;
+    --gold-light: #e6b559;
+    --paper: #faf7f2;
+    --ink: #2b2118;
+    --ink-dim: #766a5a;
+    --teal: #2f6f63;
+    --teal-soft: #e2f0ec;
+    --red: #b23a2f;
+    --red-soft: #fbe6e3;
+    --border-soft: #eee0d2;
+}
+
+/* ---------- Base ---------- */
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, "Segoe UI", sans-serif;
+    background-color: var(--paper);
+    color: var(--ink);
+    margin-bottom: 60px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+    color: var(--brand-dark);
+    font-weight: 700;
+}
+
+a {
+    color: var(--brand);
+}
+a:hover {
+    color: var(--gold);
+}
+
+::selection {
+    background-color: var(--gold-light);
+    color: var(--brand-darker);
+}
+
+/* ---------- Scrollbar (WebKit browsers) ---------- */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-track {
+    background: var(--paper);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--gold);
+    border-radius: 6px;
+    border: 2px solid var(--paper);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--brand);
+}
+
+/* ---------- Focus states (accessible, on-brand) ---------- */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.15rem var(--paper), 0 0 0 0.3rem rgba(217, 164, 65, 0.55);
+    border-color: var(--gold);
+}
+
+/* ---------- Navbar ---------- */
+.navbar {
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%) !important;
+    border-bottom: none !important;
+    box-shadow: 0 2px 8px rgba(64, 22, 33, 0.25);
+}
+.navbar-brand {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    color: #fff !important;
+    letter-spacing: 0.3px;
+}
+.navbar .nav-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-weight: 500;
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem !important;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.navbar .nav-link:hover {
+    color: #fff !important;
+    background-color: rgba(255, 255, 255, 0.12);
+}
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.4);
+}
+.navbar-toggler-icon {
+    filter: invert(1) brightness(2);
+}
+
+/* ---------- Footer ---------- */
+.footer {
+    background-color: var(--brand-darker);
+    color: rgba(255, 255, 255, 0.75);
+    border-top: none !important;
+    padding: 1rem 0;
+}
+.footer a {
+    color: var(--gold-light);
+}
+.footer a:hover {
+    color: #fff;
+}
+
+/* ---------- Default Bootstrap components (Privacy page, etc.) ---------- */
+.btn-primary {
+    background-color: var(--gold);
+    border-color: var(--gold);
+    color: var(--brand-darker);
+    font-weight: 600;
+}
+.btn-primary:hover,
+.btn-primary:active {
+    background-color: var(--gold-light) !important;
+    border-color: var(--gold-light) !important;
+    color: var(--brand-darker) !important;
+}
+
+.btn-outline-primary {
+    color: var(--brand);
+    border-color: var(--brand);
+}
+.btn-outline-primary:hover {
+    background-color: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+}
+
+.card {
+    border-color: var(--border-soft);
+    border-radius: 10px;
+}
+.card-header.bg-primary {
+    background-color: var(--brand) !important;
+}
+
+.alert-info {
+    background-color: var(--teal-soft);
+    border-color: var(--teal);
+    color: #204a41;
+}
+.alert-danger {
+    background-color: var(--red-soft);
+    border-color: var(--red);
+    color: #7a281f;
+}
+
+table.table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: #fbf6ee;
+}
+
+.badge.bg-success {
+    background-color: var(--teal) !important;
+}
+.badge.bg-warning {
+    background-color: var(--gold) !important;
+    color: var(--brand-darker) !important;
+}
+
+/* ---------- Misc ---------- */
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder {
+    color: var(--ink-dim);
+    text-align: end;
+}
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder {
+    text-align: start;
+}
+
+hr {
+    border-color: var(--border-soft);
+    opacity: 1;
+}
